@@ -1,4 +1,4 @@
-// Package config содержит функции для загрузки и валидации конфигурации приложения
+// Package config содержит функции для загрузки и валидации конфигурации приложения.
 package config
 
 import "github.com/spf13/viper"
@@ -27,6 +27,6 @@ func LoadConfig(path string) (Config, error) {
 	if err := viper.Unmarshal(&config); err != nil {
 		return Config{}, err
 	}
-	
+
 	return config, nil
 }

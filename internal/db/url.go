@@ -1,4 +1,4 @@
-// Package db модели, функции и ошибки для работы с базой данных
+// Package db модели, функции и ошибки для работы с базой данных.
 package db
 
 import (
@@ -9,13 +9,13 @@ import (
 )
 
 var (
-	ErrURLNotFound = gorm.ErrRecordNotFound
-	ErrURLConflict = gorm.ErrInvalidData
-	ErrURLExpired  = errors.New("срок действия короткой ссылки истек")
-	ErrShortURLIsEmpty = errors.New("короткая ссылка не может быть пустой")
-	ErrLongURLIsEmpty = errors.New("длинная ссылка не может быть пустой")
+	ErrURLNotFound           = gorm.ErrRecordNotFound
+	ErrURLConflict           = gorm.ErrInvalidData
+	ErrURLExpired            = errors.New("срок действия короткой ссылки истек")
+	ErrShortURLIsEmpty       = errors.New("короткая ссылка не может быть пустой")
+	ErrLongURLIsEmpty        = errors.New("длинная ссылка не может быть пустой")
 	ErrShortURLLengthInvalid = errors.New("короткая ссылка должна быть от 6 до 10 символов")
-	ErrLongURLLengthInvalid = errors.New("длинная ссылка не может быть длиннее 2048 символов")
+	ErrLongURLLengthInvalid  = errors.New("длинная ссылка не может быть длиннее 2048 символов")
 )
 
 type URL struct {
@@ -29,7 +29,7 @@ func (URL) TableName() string {
 	return "urls"
 }
 
-// IsExpired проверяет, истек ли срок действия короткой ссылки
+// IsExpired проверяет, истек ли срок действия короткой ссылки.
 func (u *URL) IsExpired() bool {
 	if u.ExpiresAt == nil {
 		return false
@@ -37,8 +37,10 @@ func (u *URL) IsExpired() bool {
 	return u.ExpiresAt.Before(time.Now())
 }
 
-// Validate валидирует URL
+// Validate валидирует URL.
 func (u *URL) Validate() error {
+	maxURLLength := 2048
+
 	if u.ShortURL == "" {
 		return ErrShortURLIsEmpty
 	}
@@ -48,7 +50,7 @@ func (u *URL) Validate() error {
 	if u.LongURL == "" {
 		return ErrLongURLIsEmpty
 	}
-	if len(u.LongURL) > 2048 {
+	if len(u.LongURL) > maxURLLength {
 		return ErrLongURLLengthInvalid
 	}
 	return nil

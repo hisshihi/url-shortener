@@ -1,10 +1,11 @@
 version: 2
 
-before:
-  hooks:
-    - go mod download
+project_name: golang-lessons
+
 builds:
-  - id: golang-lessons
+  - id: app
+    main: ./cmd/app # <--- Указали правильный путь
+    binary: url_shortner
     env:
       - CGO_ENABLED=0
     goos:
@@ -14,31 +15,18 @@ builds:
     goarch:
       - amd64
       - arm64
+
 archives:
-  - format_overrides:
+  - format: tar.gz
+    format_overrides:
       - goos: windows
-        formats:
-          - zip
-dockers:
-  - image_templates:
-      - "ghcr.io/golang-templates/seed:latest"
-      - "ghcr.io/golang-templates/seed:{{ .Major }}"
-      - "ghcr.io/golang-templates/seed:{{ .Major }}.{{ .Minor }}"
-      - "ghcr.io/golang-templates/seed:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-    build_flag_templates:
-      - "--pull"
-      # OCI annotations: https://github.com/opencontainers/image-spec/blob/main/annotations.md
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-release:
-  github:
-    owner: hisshihi
-    name: golang-lessons
-  name_template: "{{.Version}}"
-  prerelease: auto
-  mode: append
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
 changelog:
   disable: true
