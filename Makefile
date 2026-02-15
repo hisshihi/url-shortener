@@ -38,7 +38,7 @@ clean: ## remove files created during build pipeline
 
 .PHONY: run
 run: ## go run
-	go run .
+	go run cmd/url_shortner/main.go
 
 .PHONY: mod
 mod: ## go mod tidy
