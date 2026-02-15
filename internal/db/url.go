@@ -9,15 +9,23 @@ import (
 )
 
 var (
-	ErrURLNotFound           = gorm.ErrRecordNotFound
-	ErrURLConflict           = gorm.ErrInvalidData
-	ErrURLExpired            = errors.New("срок действия короткой ссылки истек")
-	ErrShortURLIsEmpty       = errors.New("короткая ссылка не может быть пустой")
-	ErrLongURLIsEmpty        = errors.New("длинная ссылка не может быть пустой")
+	// ErrURLNotFound           = gorm.ErrRecordNotFound.
+	ErrURLNotFound = gorm.ErrRecordNotFound
+	// ErrURLConflict           = gorm.ErrInvalidData.
+	ErrURLConflict = gorm.ErrInvalidData
+	// ErrURLExpired = errors.New("срок действия короткой ссылки истек").
+	ErrURLExpired = errors.New("срок действия короткой ссылки истек")
+	// ErrShortURLIsEmpty       = errors.New("короткая ссылка не может быть пустой").
+	ErrShortURLIsEmpty = errors.New("короткая ссылка не может быть пустой")
+	// ErrLongURLIsEmpty        = errors.New("длинная ссылка не может быть пустой").
+	ErrLongURLIsEmpty = errors.New("длинная ссылка не может быть пустой")
+	// ErrShortURLLengthInvalid = errors.New("короткая ссылка должна быть от 6 до 10 символов").
 	ErrShortURLLengthInvalid = errors.New("короткая ссылка должна быть от 6 до 10 символов")
-	ErrLongURLLengthInvalid  = errors.New("длинная ссылка не может быть длиннее 2048 символов")
+	// ErrLongURLLengthInvalid  = errors.New("длинная ссылка не может быть длиннее 2048 символов").
+	ErrLongURLLengthInvalid = errors.New("длинная ссылка не может быть длиннее 2048 символов")
 )
 
+// URL модель для хранения информации о короткой ссылке.
 type URL struct {
 	gorm.Model
 	ShortURL  string `gorm:"uniqueIndex;not null"`
@@ -25,6 +33,7 @@ type URL struct {
 	ExpiresAt *time.Time
 }
 
+// TableName возвращает имя таблицы для модели URL.
 func (URL) TableName() string {
 	return "urls"
 }

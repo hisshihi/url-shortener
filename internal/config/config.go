@@ -3,6 +3,7 @@ package config
 
 import "github.com/spf13/viper"
 
+// Config структура для хранения конфигурации приложения.
 type Config struct {
 	DBHost string `mapstructure:"DB_HOST"`
 	DBPort int    `mapstructure:"DB_PORT"`
@@ -11,6 +12,7 @@ type Config struct {
 	DBName string `mapstructure:"DB_NAME"`
 }
 
+// LoadConfig загружает конфигурацию из файла и переменных окружения с помощью viper.
 func LoadConfig(path string) (Config, error) {
 	// Загрузка конфигурации из файла с помощью viper
 	viper.AddConfigPath(path)

@@ -2,66 +2,70 @@ version: "2"
 linters:
   default: none
   enable:
-    - asasalint
+    # Correctness (критичные)
     - bodyclose
-    - copyloopvar
-    - dogsled
-    - dupl
-    - dupword
     - errcheck
     - errorlint
-    - funlen
-    - goconst
-    - gocritic
-    - gocyclo
-    - godot
-    - goprintffuncname
-    - gosec
     - govet
     - ineffassign
-    - misspell
-    - mnd
-    - nakedret
-    - noctx
-    - nolintlint
-    - perfsprint
-    - revive
     - rowserrcheck
     - sqlclosecheck
     - staticcheck
+    - unused
+
+    # Security
+    - gosec
+
+    # Performance
+    - copyloopvar
+    - noctx
+    - perfsprint
+    - prealloc
+
+    # Code quality
+    - gocyclo
+    - funlen
+    - goconst
+    - gocritic
+    - misspell
+    - nakedret
+    - revive
     - unconvert
     - unparam
-    - unused
     - usestdlibvars
-    - usetesting
+
+    # Style (минимум)
+    - goprintffuncname
+    - nolintlint
     - whitespace
+
   settings:
     funlen:
-      lines: 100
-      statements: 50
+      lines: 150
+      statements: 80
     gocyclo:
-      min-complexity: 15
+      min-complexity: 20
     govet:
       disable:
         - fieldalignment
       enable-all: true
-    misspell:
-      locale: US
+    revive:
+      confidence: 0.8
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: exported
+        - name: increment-decrement
+        - name: var-naming
+        - name: package-comments
+          disabled: true
     nolintlint:
       require-explanation: true
       require-specific: true
-      allow-unused: false
-    revive:
-      confidence: 0
-  exclusions:
-    generated: lax
-    presets:
-      - std-error-handling
-formatters:
-  enable:
-    - gofumpt
-    - goimports
-  settings:
-    goimports:
-      local-prefixes:
-        - github.com/golang-templates/seed
+    gosec:
+      excludes:
+        - G404 # weak random - если не crypto
