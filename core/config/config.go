@@ -1,7 +1,9 @@
 // Package config содержит функции для загрузки и валидации конфигурации приложения.
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 // Config структура для хранения конфигурации приложения.
 type Config struct {
@@ -14,9 +16,8 @@ type Config struct {
 
 // LoadConfig загружает конфигурацию из файла и переменных окружения с помощью viper.
 func LoadConfig(path string) (Config, error) {
-	// Загрузка конфигурации из файла с помощью viper
 	viper.AddConfigPath(path)
-	viper.SetConfigName(".env")
+	viper.SetConfigName("env")
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
