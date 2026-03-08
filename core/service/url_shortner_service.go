@@ -31,7 +31,7 @@ func NewURLShortnerService() *URLShortnerService {
 
 // CreateShortURL создает короткий URL из длинного
 func (s *URLShortnerService) CreateShortURL(ctx context.Context, url string) (string, error) {
-	alias, err := s.StringGenerator(6)
+	alias, err := s.StringGenerator(8)
 	if err != nil {
 		return "", err
 	}

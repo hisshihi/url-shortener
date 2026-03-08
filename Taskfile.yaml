@@ -16,7 +16,7 @@ tasks:
   run:
     desc: Run the application
     cmds:
-      - go run .
+      - go run ./cmd/app
 
   build:
     desc: Build the binary
