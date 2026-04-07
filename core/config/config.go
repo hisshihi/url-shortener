@@ -2,34 +2,29 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"fmt"
+
+	"github.com/caarlos0/env/v11"
 )
 
 // Config структура для хранения конфигурации приложения.
 type Config struct {
-	DBHost string `mapstructure:"DB_HOST"`
-	DBPort int    `mapstructure:"DB_PORT"`
-	DBUser string `mapstructure:"DB_USER"`
-	DBPass string `mapstructure:"DB_PASS"`
-	DBName string `mapstructure:"DB_NAME"`
+	DBHost     string `env:"DB_HOST"     envDefault:"localhost"`
+	DBPort     int    `env:"DB_PORT"     envDefault:"5432"`
+	DBUser     string `env:"DB_USER,required"`
+	DBPass     string `env:"DB_PASS,required"`
+	DBName     string `env:"DB_NAME,required"`
+	ServerAddr string `env:"SERVER_ADDR" envDefault:":8080"`
 }
 
-// LoadConfig загружает конфигурацию из файла и переменных окружения с помощью viper.
-func LoadConfig(path string) (Config, error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName("env")
-	viper.SetConfigType("env")
+func (c Config) DSN() string {
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		c.DBUser, c.DBPass, c.DBHost, c.DBPort, c.DBName,
+	)
+}
 
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		return Config{}, err
-	}
-
-	var config Config
-	if err := viper.Unmarshal(&config); err != nil {
-		return Config{}, err
-	}
-
-	return config, nil
+func Load() (Config, error) {
+	var cfg Config
+	return cfg, env.Parse(&cfg)
 }

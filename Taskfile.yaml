@@ -2,6 +2,8 @@ version: '3'
 
 vars:
   BIN: ./bin/app
+  BIN_DIR: '{{.ROOT_DIR}}/bin'
+  GOOSE: '{{.BIN_DIR}}/goose'
 
 tasks:
   default:
@@ -12,11 +14,32 @@ tasks:
       - task: lint
       - task: test
       - task: build
+      - task: migrate:up
+      - task: migrate:down
+
 
   run:
     desc: Run the application
     cmds:
       - go run ./cmd/app
+
+  migrate:up:
+    desc: "Накатывает все миграции"
+    dotenv: [ '.env' ]
+    cmds:
+      - 'goose up'
+
+  migrate:down:
+    desc: 'Откатывание миграции'
+    dotenv: [ '.env' ]
+    cmds:
+      - 'goose down'
+
+  goose:status:
+    desc: 'Вывести статус миграций'
+    dotenv: [ '.env' ]
+    cmds:
+      - 'goose status'
 
   build:
     desc: Build the binary
