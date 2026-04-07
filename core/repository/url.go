@@ -15,23 +15,23 @@ type URLDb interface {
 }
 
 type URLRepo interface {
-	Create(ctx context.Context, longURL string) (string, error)
+	Create(ctx context.Context, longURL, alias string) (string, error)
 }
 
-type URLRepository struct {
+type urlRepository struct {
 	db URLDb
 }
 
-func NewURLRepository(db URLDb) *URLRepository {
-	return &URLRepository{db: db}
+func NewURLRepository(db URLDb) URLRepo {
+	return &urlRepository{db: db}
 }
 
-func (r *URLRepository) Create(ctx context.Context, longURL string) (string, error) {
-	rows, err := r.db.Exec(ctx, "INSERT INTO urls (long_url) VALUES ($1)", longURL)
+func (r *urlRepository) Create(ctx context.Context, longURL, alias string) (string, error) {
+	rows, err := r.db.Exec(ctx, "INSERT INTO urls (long_url, alias) VALUES ($1, $2)", longURL, alias)
 	if err != nil {
-		slog.Error("ошибка при сохранении url", longURL, err)
+		slog.Error("ошибка при сохранении url", slog.String("long_url", longURL), slog.String("alias", alias), slog.Any("err", err))
 		return "", err
 	}
-	slog.Info("rows", rows)
-	return "", nil
+	slog.Info("rows", slog.String("rows", rows.String()))
+	return alias, nil
 }

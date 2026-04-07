@@ -1,68 +1,61 @@
-package service_test
+package service
 
 import (
-	"errors"
+	"context"
+	"strings"
 	"testing"
 
-	"github.com/hisshihi/url-shortener/core/service"
+	"github.com/hisshihi/url-shortener/core/repository/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-func TestURLShortnerService_CreateShortURL(t *testing.T) {
+func Test_urlService_CreateShortURL(t *testing.T) {
 	tests := []struct {
 		name      string
-		URL       string
-		generator service.StringGenerator
-		want      string
-		wantErr   bool
+		inputURL  string
+		repoAlias string
+		wantErr   error
 	}{
 		{
-			name: "correct URL",
-			URL:  "https://example.com/test",
-			generator: func(n int) (string, error) {
-				return "abc123", nil
-			},
-			want:    "https://example.com/abc123",
-			wantErr: false,
+			name:      "success",
+			inputURL:  "https://google.com/long/path",
+			repoAlias: "abc12345",
+			wantErr:   nil,
 		},
 		{
-			name: "incurrect URL",
-			URL:  "https://example.com/test",
-			generator: func(n int) (string, error) {
-				return "", service.ErrInvalidURL
-			},
-			wantErr: true,
+			name:     "not 8 characters",
+			inputURL: "invalid url — no scheme",
+			wantErr:  ErrInvalidURL,
 		},
 		{
-			name: "generator error",
-			URL:  "https://example.com/test",
-			generator: func(n int) (string, error) {
-				return "", errors.New("generator error")
-			},
-			wantErr: true,
-		},
-		{
-			name:    "err URL",
-			URL:     "invalid-url",
-			generator: func(n int) (string, error) {
-				return "abc123", nil
-			},
-			wantErr: true,
+			name:     "empty url",
+			inputURL: "",
+			wantErr:  ErrInvalidURL,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svc := service.NewURLShortnerService()
-			if tt.generator != nil {
-				svc.StringGenerator = tt.generator
-			}
-			got, err := svc.CreateShortURL(t.Context(), tt.URL)
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("wantErr=%v, got err=%v", tt.wantErr, err)
-			}
-			if got != tt.want {
-				t.Errorf("got %q, want %q", got, tt.want)
+			mockRepo := mocks.NewMockURLRepo(t)
+
+			if tt.wantErr == nil {
+				mockRepo.On("Create", context.Background(), tt.inputURL, mock.AnythingOfType("string")).
+					Once().
+					Return(tt.repoAlias, nil)
 			}
 
+			s := &urlService{urlRepo: mockRepo}
+			got, err := s.CreateShortURL(context.Background(), tt.inputURL)
+
+			assert.ErrorIs(t, err, tt.wantErr)
+			if tt.wantErr == nil {
+				parts := strings.Split(got, "/")
+				alias := parts[len(parts)-1]
+				assert.Len(t, alias, 8)
+				t.Logf("got: %s, alias: %s", got, alias)
+
+				assert.Equal(t, tt.repoAlias, alias)
+			}
 		})
 	}
 }

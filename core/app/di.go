@@ -7,6 +7,7 @@ import (
 	"github.com/hisshihi/url-shortener/core/config"
 	"github.com/hisshihi/url-shortener/core/database"
 	"github.com/hisshihi/url-shortener/core/repository"
+	"github.com/hisshihi/url-shortener/core/service"
 )
 
 type diContainer struct {
@@ -15,6 +16,8 @@ type diContainer struct {
 	db database.DB
 
 	urlRepo repository.URLRepo
+
+	urlService service.URLService
 }
 
 func NewDIContainer(cfg config.Config) *diContainer {
@@ -40,4 +43,12 @@ func (d *diContainer) URlRepo() repository.URLRepo {
 	}
 
 	return d.urlRepo
+}
+
+func (d *diContainer) URLService() service.URLService {
+	if d.urlService == nil {
+		d.urlService = service.NewURLService(d.URlRepo())
+	}
+
+	return d.urlService
 }
