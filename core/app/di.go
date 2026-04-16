@@ -18,17 +18,17 @@ type diContainer struct {
 	db *database.DB
 
 	// repos
-	urlRepo repository.URLRepo
+	urlRepo *repository.URLRepository
 
 	// services
-	urlService service.URLService
+	urlService *service.URLService
 }
 
 func NewDIContainer(cfg config.Config) *diContainer {
 	return &diContainer{cfg: cfg}
 }
 
-func (d *diContainer) DB() repository.URLDb {
+func (d *diContainer) DB() *database.DB {
 	if d.db == nil {
 		dsn := d.cfg.DSN()
 		db, err := database.New(dsn)
@@ -41,7 +41,7 @@ func (d *diContainer) DB() repository.URLDb {
 	return d.db
 }
 
-func (d *diContainer) URlRepo() repository.URLRepo {
+func (d *diContainer) URLRepo() *repository.URLRepository {
 	if d.urlRepo == nil {
 		d.urlRepo = repository.NewURLRepository(d.DB())
 	}
@@ -49,9 +49,9 @@ func (d *diContainer) URlRepo() repository.URLRepo {
 	return d.urlRepo
 }
 
-func (d *diContainer) URLService() service.URLService {
+func (d *diContainer) URLService() *service.URLService {
 	if d.urlService == nil {
-		d.urlService = service.NewURLService(d.URlRepo())
+		d.urlService = service.NewURLService(d.URLRepo())
 	}
 
 	return d.urlService

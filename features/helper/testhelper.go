@@ -1,9 +1,8 @@
-package repository
+package helper
 
 import (
 	"context"
 	"log"
-	"os"
 	"testing"
 
 	"github.com/jackc/pgx/v5"
@@ -13,10 +12,10 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-// testPool - одна на весь пакет, поднимается в TestMain
+// testPool - одна на весь пакет тестов
 var testPool *pgxpool.Pool
 
-func TestMain(m *testing.M) {
+func SetupTestPostgres(m *testing.M) (code int) {
 	ctx := context.Background()
 
 	ctr, err := postgres.Run(ctx,
@@ -54,10 +53,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("не удалось накатить миграции: %v", err)
 	}
 
-	// m.Run() — запускает все Test* функции в пакете
-	// os.Exit нужен чтобы код выхода корректно пробросился
-	code := m.Run()
-	os.Exit(code)
+	return m.Run()
 }
 
 func runMigrations(ctx context.Context, pool *pgxpool.Pool) error {
@@ -74,10 +70,10 @@ func runMigrations(ctx context.Context, pool *pgxpool.Pool) error {
 	return err
 }
 
-// newTx создаёт транзакцию для одного теста.
+// NewTx создаёт транзакцию для одного теста.
 // После теста делает Rollback — следующий тест получает чистую БД.
 // Это быстрее чем TRUNCATE и не требует порядка выполнения тестов.
-func newTx(t *testing.T) pgx.Tx {
+func NewTx(t *testing.T) pgx.Tx {
 	t.Helper()
 
 	tx, err := testPool.Begin(context.Background())

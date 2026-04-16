@@ -2,16 +2,22 @@ package repository
 
 import (
 	"context"
+	"os"
 	"testing"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/hisshihi/url-shortener/core/database"
+	"github.com/hisshihi/url-shortener/features/helper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func TestMain(m *testing.M) {
+	os.Exit(helper.SetupTestPostgres(m))
+}
+
 func Test_urlRepository_Create(t *testing.T) {
 	t.Run("успешно создаёт url и возвращает alias", func(t *testing.T) {
-		tx := newTx(t)
+		tx := helper.NewTx(t)
 		repo := NewURLRepository(tx)
 
 		alias, err := repo.Create(context.Background(), "https://example.com/long/url", "ex")
@@ -21,7 +27,7 @@ func Test_urlRepository_Create(t *testing.T) {
 	})
 
 	t.Run("дублирование alias", func(t *testing.T) {
-		tx := newTx(t)
+		tx := helper.NewTx(t)
 		repo := NewURLRepository(tx)
 		_, _ = repo.Create(context.Background(), "https://example.com/long/url", "ex")
 
@@ -33,7 +39,7 @@ func Test_urlRepository_Create(t *testing.T) {
 
 func Test_urlRepository_SelectByAlias(t *testing.T) {
 	t.Run("успешно найден long url по alias", func(t *testing.T) {
-		tx := newTx(t)
+		tx := helper.NewTx(t)
 		repo := NewURLRepository(tx)
 		var err error
 		var alias, url string
@@ -46,7 +52,7 @@ func Test_urlRepository_SelectByAlias(t *testing.T) {
 	})
 
 	t.Run("long url не найден", func(t *testing.T) {
-		tx := newTx(t)
+		tx := helper.NewTx(t)
 		repo := NewURLRepository(tx)
 		var err error
 		var alias string
@@ -54,11 +60,11 @@ func Test_urlRepository_SelectByAlias(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = repo.SelectByAlias(context.Background(), alias+" fake")
-		require.Error(t, pgx.ErrNoRows)
+		require.ErrorIs(t, err, database.ErrURLNotFound)
 	})
 
 	t.Run("ошибка бд", func(t *testing.T) {
-		tx := newTx(t)
+		tx := helper.NewTx(t)
 		repo := NewURLRepository(tx)
 		var err error
 		var nilString string
