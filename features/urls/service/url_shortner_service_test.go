@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/hisshihi/url-shortener/core/database"
 	"github.com/hisshihi/url-shortener/features/urls/repository/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -109,4 +110,44 @@ func Test_validateURL(t *testing.T) {
 			assert.Equalf(t, tt.want, validateURL(tt.args.rawURL), "validateURL(%v)", tt.args.rawURL)
 		})
 	}
+}
+
+func TestURLService_SelectByAlias(t *testing.T) {
+	t.Run("успешно возвращает alias", func(t *testing.T) {
+		alias := "https://shortener/ZZZZZZZZ"
+		mockRepo := mocks.NewMockURLRepo(t)
+		mockRepo.EXPECT().
+			SelectByAlias(mock.Anything, alias).
+			Return("https://google.com/long/path", nil).
+			Times(1)
+		s := &URLService{urlRepo: mockRepo}
+		got, err := s.SelectByAlias(context.Background(), alias)
+		assert.NoError(t, err)
+		assert.Equal(t, "https://google.com/long/path", got)
+	})
+
+	t.Run("url not found by alias", func(t *testing.T) {
+		alias := "https://shortenerz/ZZZZZZZZ"
+		mockRepo := mocks.NewMockURLRepo(t)
+		mockRepo.EXPECT().
+			SelectByAlias(mock.Anything, alias).
+			Return("", database.ErrURLNotFound)
+		s := &URLService{urlRepo: mockRepo}
+		got, err := s.SelectByAlias(context.Background(), alias)
+		assert.Error(t, err)
+		assert.Equal(t, "", got)
+	})
+
+	t.Run("repo error", func(t *testing.T) {
+		alias := "https://shortener/ZZZZZZZZ"
+		mockRepo := mocks.NewMockURLRepo(t)
+		mockRepo.EXPECT().
+			SelectByAlias(mock.Anything, alias).
+			Return("", errors.New("database error")).
+			Times(1)
+		s := &URLService{urlRepo: mockRepo}
+		got, err := s.SelectByAlias(context.Background(), alias)
+		assert.Error(t, err)
+		assert.Equal(t, "", got)
+	})
 }

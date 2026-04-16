@@ -33,7 +33,6 @@ func NewURLService(urlRepository URLRepository) *URLService {
 
 // CreateShortURL создает короткий URL из длинного
 func (s *URLService) CreateShortURL(ctx context.Context, rawUrl string) (string, error) {
-
 	isValid := validateURL(rawUrl)
 	if !isValid {
 		return "", ErrInvalidURL
@@ -63,4 +62,13 @@ func validateURL(rawURL string) bool {
 	}
 
 	return true
+}
+
+func (s *URLService) SelectByAlias(ctx context.Context, alias string) (string, error) {
+	isValid := validateURL(alias)
+	if !isValid {
+		return "", ErrInvalidURL
+	}
+
+	return s.urlRepo.SelectByAlias(ctx, alias)
 }
