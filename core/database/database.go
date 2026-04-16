@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -11,30 +12,19 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type DB interface {
-	// Query выполняет SQL-запрос, который возвращает набор строк.
-	// Принимает контекст запроса ctx, текст SQL и позиционные параметры args.
-	// Возвращает pgx.Rows для чтения результата и ошибку выполнения (если произошла).
-	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
-	// QueryRow выполняет SQL-запрос, который ожидает одну строку результата.
-	// Принимает контекст запроса ctx, текст SQL и позиционные параметры args.
-	// Возвращает pgx.Row, из которого можно считать значения; фактическая ошибка
-	// будет доступна при вызове Scan.
-	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
-	// Exec выполняет SQL-команду, которая не возвращает строки (например, INSERT/UPDATE/DELETE).
-	// Принимает контекст запроса ctx, текст SQL и позиционные параметры args.
-	// Возвращает pgconn.CommandTag (метаданные о выполненной команде) и ошибку выполнения (если произошла).
-	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
-}
+var (
+	ErrURLNotFound = errors.New("url not found")
+	ErrNotInserted = errors.New("not inserted")
+)
 
-type db struct {
+type DB struct {
 	pool *pgxpool.Pool
 }
 
 // New создает подключение к PostgreSQL по строке подключения dsn и возвращает реализацию DB.
 // Принимает dsn (строку подключения); если dsn пустая или подключение/проверка недоступны,
 // возвращает nil и ошибку. При успехе возвращает DB и nil.
-func New(dsn string) (DB, error) {
+func New(dsn string) (*DB, error) {
 	if dsn == "" {
 		return nil, fmt.Errorf("dsn is empty")
 	}
@@ -60,13 +50,13 @@ func New(dsn string) (DB, error) {
 	}
 
 	slog.Info("database connection established")
-	return &db{pool: pool}, nil
+	return &DB{pool: pool}, nil
 }
 
 // Query выполняет SQL-запрос, который возвращает набор строк.
 // Принимает контекст запроса ctx, текст SQL и позиционные параметры args.
 // Возвращает pgx.Rows для чтения результата и ошибку выполнения (если произошла).
-func (d *db) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
+func (d *DB) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
 	return d.pool.Query(ctx, sql, args...)
 }
 
@@ -74,13 +64,13 @@ func (d *db) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, erro
 // Принимает контекст запроса ctx, текст SQL и позиционные параметры args.
 // Возвращает pgx.Row, из которого можно считать значения; фактическая ошибка
 // будет доступна при вызове Scan.
-func (d *db) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
+func (d *DB) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
 	return d.pool.QueryRow(ctx, sql, args...)
 }
 
 // Exec выполняет SQL-команду, которая не возвращает строки (например, INSERT/UPDATE/DELETE).
 // Принимает контекст запроса ctx, текст SQL и позиционные параметры args.
 // Возвращает pgconn.CommandTag (метаданные о выполненной команде) и ошибку выполнения (если произошла).
-func (d *db) Exec(ctx context.Context, sql string, args ...interface{}) (pgconn.CommandTag, error) {
+func (d *DB) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
 	return d.pool.Exec(ctx, sql, args...)
 }

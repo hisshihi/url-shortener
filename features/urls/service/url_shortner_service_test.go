@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hisshihi/url-shortener/core/repository/mocks"
+	"github.com/hisshihi/url-shortener/features/urls/repository/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

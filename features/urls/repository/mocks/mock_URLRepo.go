@@ -108,3 +108,69 @@ func (_c *MockURLRepo_Create_Call) RunAndReturn(run func(ctx context.Context, lo
 	_c.Call.Return(run)
 	return _c
 }
+
+// SelectByAlias provides a mock function for the type MockURLRepo
+func (_mock *MockURLRepo) SelectByAlias(ctx context.Context, alias string) (string, error) {
+	ret := _mock.Called(ctx, alias)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SelectByAlias")
+	}
+
+	var r0 string
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
+		return returnFunc(ctx, alias)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) string); ok {
+		r0 = returnFunc(ctx, alias)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = returnFunc(ctx, alias)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockURLRepo_SelectByAlias_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SelectByAlias'
+type MockURLRepo_SelectByAlias_Call struct {
+	*mock.Call
+}
+
+// SelectByAlias is a helper method to define mock.On call
+//   - ctx context.Context
+//   - alias string
+func (_e *MockURLRepo_Expecter) SelectByAlias(ctx interface{}, alias interface{}) *MockURLRepo_SelectByAlias_Call {
+	return &MockURLRepo_SelectByAlias_Call{Call: _e.mock.On("SelectByAlias", ctx, alias)}
+}
+
+func (_c *MockURLRepo_SelectByAlias_Call) Run(run func(ctx context.Context, alias string)) *MockURLRepo_SelectByAlias_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockURLRepo_SelectByAlias_Call) Return(s string, err error) *MockURLRepo_SelectByAlias_Call {
+	_c.Call.Return(s, err)
+	return _c
+}
+
+func (_c *MockURLRepo_SelectByAlias_Call) RunAndReturn(run func(ctx context.Context, alias string) (string, error)) *MockURLRepo_SelectByAlias_Call {
+	_c.Call.Return(run)
+	return _c
+}
