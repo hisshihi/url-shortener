@@ -49,7 +49,7 @@ tasks:
   test:
     desc: Run tests with race detector
     cmds:
-      - go test -race -v -cover ./...
+      - go test -race -v -cover -count=100 ./...
 
   lint:
     desc: Run golangci-lint
