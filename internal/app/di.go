@@ -4,10 +4,12 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/hisshihi/url-shortener/core/config"
-	"github.com/hisshihi/url-shortener/core/database"
+	"github.com/hisshihi/url-shortener/features/urls/api"
 	"github.com/hisshihi/url-shortener/features/urls/repository"
 	"github.com/hisshihi/url-shortener/features/urls/service"
+	"github.com/hisshihi/url-shortener/internal/closer"
+	"github.com/hisshihi/url-shortener/internal/config"
+	"github.com/hisshihi/url-shortener/internal/database"
 )
 
 type diContainer struct {
@@ -22,6 +24,9 @@ type diContainer struct {
 
 	// services
 	urlService *service.URLService
+
+	//	http
+	urlHandler *api.Handler
 }
 
 func NewDIContainer(cfg config.Config) *diContainer {
@@ -36,6 +41,9 @@ func (d *diContainer) DB() *database.DB {
 			slog.Error(err.Error())
 			os.Exit(1)
 		}
+
+		closer.Add("база данных", db.Close)
+
 		d.db = db
 	}
 	return d.db
@@ -55,4 +63,11 @@ func (d *diContainer) URLService() *service.URLService {
 	}
 
 	return d.urlService
+}
+
+func (d *diContainer) URLHandler() *api.Handler {
+	if d.urlHandler == nil {
+		d.urlHandler = api.NewUrlHandler(d.URLService())
+	}
+	return d.urlHandler
 }

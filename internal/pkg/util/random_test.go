@@ -3,7 +3,7 @@ package util_test
 import (
 	"testing"
 
-	"github.com/hisshihi/url-shortener/core/pkg/util"
+	"github.com/hisshihi/url-shortener/internal/pkg/util"
 )
 
 func TestGenerateRandomString(t *testing.T) {

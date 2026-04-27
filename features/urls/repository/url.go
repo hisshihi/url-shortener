@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/hisshihi/url-shortener/core/database"
+	"github.com/hisshihi/url-shortener/internal/database"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )

@@ -74,3 +74,8 @@ func (d *DB) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
 func (d *DB) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
 	return d.pool.Exec(ctx, sql, args...)
 }
+
+func (d *DB) Close(_ context.Context) error {
+	d.pool.Close()
+	return nil
+}

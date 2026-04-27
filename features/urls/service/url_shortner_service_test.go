@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hisshihi/url-shortener/core/database"
 	"github.com/hisshihi/url-shortener/features/urls/repository/mocks"
+	"github.com/hisshihi/url-shortener/internal/database"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -131,7 +131,8 @@ func TestURLService_SelectByAlias(t *testing.T) {
 		mockRepo := mocks.NewMockURLRepo(t)
 		mockRepo.EXPECT().
 			SelectByAlias(mock.Anything, alias).
-			Return("", database.ErrURLNotFound)
+			Return("", database.ErrURLNotFound).
+			Times(1)
 		s := &URLService{urlRepo: mockRepo}
 		got, err := s.SelectByAlias(context.Background(), alias)
 		assert.Error(t, err)

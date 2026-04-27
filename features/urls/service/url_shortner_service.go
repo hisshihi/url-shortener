@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"net/url"
 
-	"github.com/hisshihi/url-shortener/core/pkg/util"
+	"github.com/hisshihi/url-shortener/internal/pkg/util"
 )
 
 var (

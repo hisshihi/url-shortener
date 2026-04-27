@@ -9,12 +9,12 @@ import (
 
 // Config структура для хранения конфигурации приложения.
 type Config struct {
-	DBHost     string `env:"DB_HOST"     envDefault:"localhost"`
-	DBPort     int    `env:"DB_PORT"     envDefault:"5432"`
-	DBUser     string `env:"DB_USER,required"`
-	DBPass     string `env:"DB_PASS,required"`
-	DBName     string `env:"DB_NAME,required"`
-	ServerAddr string `env:"SERVER_ADDR" envDefault:":8080"`
+	DBHost   string `env:"DB_HOST"     envDefault:"localhost"`
+	DBPort   int    `env:"DB_PORT"     envDefault:"5432"`
+	DBUser   string `env:"DB_USER,required"`
+	DBPass   string `env:"DB_PASS,required"`
+	DBName   string `env:"DB_NAME,required"`
+	HTTPAddr string `env:"HTTP_ADDR" envDefault:":8080"`
 }
 
 func (c Config) DSN() string {
