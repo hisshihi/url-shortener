@@ -2,7 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+
+	"github.com/hisshihi/url-shortener/internal/service"
 )
 
 func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +20,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 
 	url, err := h.svc.CreateShortURL(r.Context(), request.URL)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		respondError(w, err)
 		return
 	}
 
@@ -26,5 +29,18 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 	if err = json.NewEncoder(w).Encode(url); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+}
+
+func respondError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Is(err, service.ErrInvalidURL):
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "Invalid URL", http.StatusBadRequest)
+	default:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
