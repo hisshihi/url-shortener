@@ -4,12 +4,12 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/hisshihi/url-shortener/features/urls/api"
-	"github.com/hisshihi/url-shortener/features/urls/repository"
-	"github.com/hisshihi/url-shortener/features/urls/service"
 	"github.com/hisshihi/url-shortener/internal/closer"
 	"github.com/hisshihi/url-shortener/internal/config"
 	"github.com/hisshihi/url-shortener/internal/database"
+	"github.com/hisshihi/url-shortener/internal/handler"
+	"github.com/hisshihi/url-shortener/internal/repository"
+	"github.com/hisshihi/url-shortener/internal/service"
 )
 
 type diContainer struct {
@@ -23,10 +23,10 @@ type diContainer struct {
 	urlRepo *repository.URLRepository
 
 	// services
-	urlService *service.URLService
+	urlService service.UrlShorterService
 
 	//	http
-	urlHandler *api.Handler
+	urlHandler *handler.Handler
 }
 
 func NewDIContainer(cfg config.Config) *diContainer {
@@ -57,7 +57,7 @@ func (d *diContainer) URLRepo() *repository.URLRepository {
 	return d.urlRepo
 }
 
-func (d *diContainer) URLService() *service.URLService {
+func (d *diContainer) URLService() service.UrlShorterService {
 	if d.urlService == nil {
 		d.urlService = service.NewURLService(d.URLRepo())
 	}
@@ -65,9 +65,9 @@ func (d *diContainer) URLService() *service.URLService {
 	return d.urlService
 }
 
-func (d *diContainer) URLHandler() *api.Handler {
+func (d *diContainer) URLHandler() *handler.Handler {
 	if d.urlHandler == nil {
-		d.urlHandler = api.NewUrlHandler(d.URLService())
+		d.urlHandler = handler.NewUrlHandler(d.URLService())
 	}
 	return d.urlHandler
 }

@@ -10,14 +10,12 @@ import (
 
 func main() {
 	_ = godotenv.Load()
-	var cfg config.Config
-	var err error
-	cfg, err = config.Load()
+	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
-	a := app.New(cfg)
-	if err = a.Run(); err != nil {
+	err = app.New(cfg).Run()
+	if err != nil {
 		log.Fatal(err)
 	}
 }

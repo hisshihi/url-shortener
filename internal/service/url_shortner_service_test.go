@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hisshihi/url-shortener/features/urls/repository/mocks"
 	"github.com/hisshihi/url-shortener/internal/database"
+	"github.com/hisshihi/url-shortener/internal/repository/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -33,7 +33,7 @@ func Test_urlService_CreateShortURL_success(t *testing.T) {
 			}).
 			Once()
 
-		s := &URLService{
+		s := &urlShorter{
 			urlRepo: mockRepo,
 		}
 
@@ -59,7 +59,7 @@ func Test_urlService_CreateShortURL_success(t *testing.T) {
 			}).
 			Once()
 
-		s := &URLService{
+		s := &urlShorter{
 			urlRepo: mockRepo,
 		}
 		_, err := s.CreateShortURL(context.Background(), inputURL)
@@ -69,7 +69,7 @@ func Test_urlService_CreateShortURL_success(t *testing.T) {
 	t.Run("not valid url", func(t *testing.T) {
 		url := "/path"
 		mockRepo := mocks.NewMockURLRepo(t)
-		s := &URLService{mockRepo}
+		s := &urlShorter{mockRepo}
 		_, err := s.CreateShortURL(context.Background(), url)
 		assert.ErrorIs(t, err, ErrInvalidURL)
 	})
@@ -120,7 +120,7 @@ func TestURLService_SelectByAlias(t *testing.T) {
 			SelectByAlias(mock.Anything, alias).
 			Return("https://google.com/long/path", nil).
 			Times(1)
-		s := &URLService{urlRepo: mockRepo}
+		s := &urlShorter{urlRepo: mockRepo}
 		got, err := s.SelectByAlias(context.Background(), alias)
 		assert.NoError(t, err)
 		assert.Equal(t, "https://google.com/long/path", got)
@@ -133,7 +133,7 @@ func TestURLService_SelectByAlias(t *testing.T) {
 			SelectByAlias(mock.Anything, alias).
 			Return("", database.ErrURLNotFound).
 			Times(1)
-		s := &URLService{urlRepo: mockRepo}
+		s := &urlShorter{urlRepo: mockRepo}
 		got, err := s.SelectByAlias(context.Background(), alias)
 		assert.Error(t, err)
 		assert.Equal(t, "", got)
@@ -146,7 +146,7 @@ func TestURLService_SelectByAlias(t *testing.T) {
 			SelectByAlias(mock.Anything, alias).
 			Return("", errors.New("database error")).
 			Times(1)
-		s := &URLService{urlRepo: mockRepo}
+		s := &urlShorter{urlRepo: mockRepo}
 		got, err := s.SelectByAlias(context.Background(), alias)
 		assert.Error(t, err)
 		assert.Equal(t, "", got)

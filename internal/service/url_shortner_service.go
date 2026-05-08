@@ -20,19 +20,32 @@ type URLRepository interface {
 	SelectByAlias(ctx context.Context, alias string) (string, error)
 }
 
-type URLService struct {
+type UrlShorterServiceCreate interface {
+	CreateShortURL(ctx context.Context, rawUrl string) (string, error)
+}
+
+type UrlShorterServiceSelect interface {
+	SelectByAlias(ctx context.Context, alias string) (string, error)
+}
+
+type UrlShorterService interface {
+	UrlShorterServiceCreate
+	UrlShorterServiceSelect
+}
+
+type urlShorter struct {
 	urlRepo URLRepository
 }
 
-func NewURLService(urlRepository URLRepository) *URLService {
+func NewURLService(urlRepository URLRepository) UrlShorterService {
 	slog.Info("сервис url создан")
-	return &URLService{
+	return &urlShorter{
 		urlRepo: urlRepository,
 	}
 }
 
 // CreateShortURL создает короткий URL из длинного
-func (s *URLService) CreateShortURL(ctx context.Context, rawUrl string) (string, error) {
+func (s *urlShorter) CreateShortURL(ctx context.Context, rawUrl string) (string, error) {
 	isValid := validateURL(rawUrl)
 	if !isValid {
 		return "", ErrInvalidURL
@@ -64,7 +77,7 @@ func validateURL(rawURL string) bool {
 	return true
 }
 
-func (s *URLService) SelectByAlias(ctx context.Context, alias string) (string, error) {
+func (s *urlShorter) SelectByAlias(ctx context.Context, alias string) (string, error) {
 	isValid := validateURL(alias)
 	if !isValid {
 		return "", ErrInvalidURL

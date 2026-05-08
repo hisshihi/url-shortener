@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hisshihi/url-shortener/features/helper"
 	"github.com/hisshihi/url-shortener/internal/database"
+	"github.com/hisshihi/url-shortener/internal/helper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE urls (
     id BIGSERIAL PRIMARY KEY ,
-    alias VARCHAR(16) NOT NULL UNIQUE ,
+    alias TEXT NOT NULL UNIQUE ,
     long_url TEXT NOT NULL ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
