@@ -5,32 +5,31 @@ import (
 	"net/http"
 )
 
-func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getByAlias(w http.ResponseWriter, r *http.Request) {
 	var request struct {
-		URL string `json:"url"`
+		Alias string `json:"alias"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Ошибка при передачи данных", http.StatusBadRequest)
 		return
 	}
 
-	url, err := h.svc.CreateShortURL(r.Context(), request.URL)
+	alias, err := h.svc.SelectByAlias(r.Context(), request.Alias)
 	if err != nil {
 		respondError(w, err)
-		return
 	}
 
 	var response struct {
 		URL string `json:"url"`
 	}
 
-	response.URL = url
+	response.URL = alias
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusMovedPermanently)
 	if err = json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		respondError(w, err)
 		return
 	}
 }

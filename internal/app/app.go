@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"io"
 	"log/slog"
 	"net/http"
 	"os/signal"
@@ -39,7 +40,7 @@ func (a *App) initDeps() {
 func (a *App) initHTTPServer() {
 	a.httpServer = &http.Server{
 		Addr:         a.diContainer.cfg.HTTPAddr,
-		Handler:      a.diContainer.URLHandler().Routes(),
+		Handler:      drainAndClose(a.diContainer.URLHandler().Routes()),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,
@@ -81,4 +82,14 @@ func (a *App) Run() error {
 	}
 
 	return nil
+}
+
+func drainAndClose(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			io.Copy(io.Discard, r.Body)
+			r.Body.Close()
+		}()
+		next.ServeHTTP(w, r)
+	})
 }
